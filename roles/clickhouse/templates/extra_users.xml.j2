@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<clickhouse>
+  <!-- Docs: <https://clickhouse.tech/docs/en/operations/settings/settings_users/> -->
+  <users>
+
+    {% for member in members %}
+<{{ member.name }}>
+        <profile>default</profile>
+        <networks>
+        <ip>::/0</ip>
+        </networks>
+        <password_sha256_hex>{{ member.password | hash('sha256') }}</password_sha256_hex>
+        <quota>default</quota>
+        <access_management>{{ member.access_management }}</access_management>
+    </{{ member.name }}>
+
+    {% endfor %}
+  </users>
+</clickhouse>

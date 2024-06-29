@@ -1,0 +1,138 @@
+---
+  - name: Ensure clickhouse group exists
+    group:
+      name: clickhouse
+      state: present
+  
+  - name: Ensure clickhouse user exists
+    user:
+      name: clickhouse
+      group: clickhouse
+      home: /nonexistent
+      shell: /usr/sbin/nologin
+      state: present
+
+  - name: Install additional packages deb
+    apt:
+      name: "{{ deb_extra_packages }}"
+    when: ansible_facts['os_family'] == "Debian"
+
+  - name: Install additional packages rpm
+    yum:
+      name: "{{ rpm_extra_packages }}"
+    when: ansible_facts['os_family'] == "RedHat"
+
+  - name: apt add CH repo 
+    shell: |
+      apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 8919F6BD2B48D754
+      echo "deb https://packages.clickhouse.com/deb stable main" | sudo tee /etc/apt/sources.list.d/clickhouse.list
+      apt-get update
+    when: ansible_facts['os_family'] == "Debian"
+
+  - name: yum add CH repo 
+    shell: |
+      yum-config-manager --add-repo https://packages.clickhouse.com/rpm/clickhouse.repo
+    when: ansible_facts['os_family'] == "RedHat"
+
+  - name: Install CH package deb
+    apt:
+      name: "{{ item }}"
+    when: ansible_facts['os_family'] == "Debian"
+    loop:
+      - clickhouse-server
+      - clickhouse-client
+
+  - name: Install CH package rpm
+    yum:
+      name: "{{ item }}"
+    when: ansible_facts['os_family'] == "RedHat"
+    loop:
+      - clickhouse-server
+      - clickhouse-client
+
+  - name: Ensure clickhouse-server is stopped and disabled on keeper server
+    systemd:
+      name: clickhouse-server
+      enabled: no
+      state: stopped
+    when: inventory_hostname in groups['keeper']
+
+  - name: Create CH data dir
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: clickhouse
+      group: clickhouse
+      mode: '0750'
+    loop:
+      - /data
+
+  - name: Create CH log dir
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: clickhouse
+      group: clickhouse
+      mode: '0770'
+    loop:
+      - /var/log/clickhouse-server
+
+  - name: Create CH config dir
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: clickhouse
+      group: clickhouse
+      mode: '0750'
+    loop:
+      - /etc/clickhouse-keeper
+      - /etc/clickhouse-keeper/config.d
+      - /etc/clickhouse-keeper/users.d
+
+  - name: Copy CH config.xml config file
+    copy:
+      src: roles/clickhouse/files/config.xml
+      dest: /etc/clickhouse-keeper/config.xml
+      owner: clickhouse
+      group: clickhouse
+      mode: '0644'
+    notify: "restart ch keeper"
+
+  - name: Copy CH users.xml config file
+    template:
+      src: roles/clickhouse/templates/users.xml.j2
+      dest: /etc/clickhouse-keeper/users.xml
+      owner: clickhouse
+      group: clickhouse
+      mode: '0644'
+
+  - name: Copy CH keeper.xml config file
+    template:
+      src: roles/clickhouse/templates/keeper.xml.j2
+      dest: /etc/clickhouse-keeper/config.d/config.xml
+      owner: clickhouse
+      group: clickhouse
+      mode: '0644'
+    notify: "restart ch keeper"
+
+  - name: Copy ClickHouse Keeper systemd file
+    copy:
+      src: roles/clickhouse/files/clickhouse-keeper.service
+      dest: /etc/systemd/system/clickhouse-keeper.service
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Reload systemd
+    systemd:
+      daemon_reload: yes
+
+  - name: Enable ClickHouse Keeper service
+    systemd:
+      name: clickhouse-keeper
+      enabled: yes
+
+  - name: Start ClickHouse Keeper service
+    systemd:
+      name: clickhouse-keeper
+      state: started

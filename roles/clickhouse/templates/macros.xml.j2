@@ -1,0 +1,6 @@
+<clickhouse>
+<macros>
+    <shard>01</shard>
+    <replica>0{{ groups.clickhouse.index(inventory_hostname)+1}}</replica>
+</macros>
+</clickhouse>

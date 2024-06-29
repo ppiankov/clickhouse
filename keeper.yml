@@ -1,0 +1,11 @@
+- name: Configure ClickHouse Keepers
+  hosts: keeper
+  become: yes
+  roles:
+    - role: clickhouse
+  vars:
+    rpm_extra_packages:
+      - net-tools
+      - vim
+  tasks:
+    - include_tasks: roles/clickhouse/tasks/keeper.yml
