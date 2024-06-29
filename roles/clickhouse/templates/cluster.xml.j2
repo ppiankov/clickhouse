@@ -1,0 +1,16 @@
+<clickhouse>
+<remote_servers>
+    <{{ cluster_name }}>
+        <shard>
+            <internal_replication>true</internal_replication>
+{% for host in groups['clickhouse'] %} 
+            <replica>
+                <host>{{ host }}</host>
+                <port>9000</port>
+             </replica>
+{% endfor%}
+        </shard>
+    </{{ cluster_name }}>
+</remote_servers>
+</clickhouse>
+

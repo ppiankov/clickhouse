@@ -1,0 +1,10 @@
+<clickhouse>
+<zookeeper>
+{% for host in groups['keeper'] %}
+    <node>
+        <host>{{ host }}</host>
+        <port>9181</port>
+    </node>
+{% endfor%}
+</zookeeper>
+</clickhouse>

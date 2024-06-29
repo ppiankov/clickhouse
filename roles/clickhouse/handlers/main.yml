@@ -1,0 +1,13 @@
+---
+# handlers file for victoria_metrics
+  - name: Restart CH service
+    service:
+      name: clickhouse-server.service
+      state: restarted
+    listen: "restart ch"
+
+  - name: Restart CH keeper service
+    service:
+      name: clickhouse-keeper.service
+      state: restarted
+    listen: "restart ch keeper"

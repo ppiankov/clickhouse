@@ -1,0 +1,20 @@
+- name: Configure ClickHouse Servers
+  hosts: clickhouse
+  become: yes
+  roles:
+    - role: clickhouse
+  vars:
+    rpm_extra_packages:
+      - net-tools
+      - vim
+  tasks:
+    - include_tasks: roles/clickhouse/tasks/clickhouse-install.yml
+  handlers:
+    - name: Regenerate GRUB configuration
+      shell: grub2-mkconfig -o /boot/grub2/grub.cfg
+      when: ansible_facts['os_family'] == "RedHat"
+  
+    - name: restart ch
+      systemd:
+        name: clickhouse-server.service
+        state: restarted

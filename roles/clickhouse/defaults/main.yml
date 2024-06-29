@@ -1,0 +1,9 @@
+---
+# defaults file for victoria_metrics
+
+extra_packages:
+  - net-tools
+  - nano
+  - dirmngr
+  - tzdata
+  - ca-certificates
