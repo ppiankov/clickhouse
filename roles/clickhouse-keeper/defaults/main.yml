@@ -1,0 +1,9 @@
+---
+# defaults
+
+extra_packages:
+    - net-tools
+    - nano
+    - dirmngr
+    - tzdata
+    - ca-certificates

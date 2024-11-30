@@ -1,0 +1,13 @@
+# vars/main.yml
+
+query_log_lifetime: 604800 # 7 days in seconds
+trace_log_lifetime: 604800 # 7 days in seconds
+cluster_name: ch0
+ch_password: the_super_secret_password
+members:
+    - name: one_more_user
+      password: "one_more_user_super_secret_password"
+      access_management: 0
+    - name: one_more_admin
+      password: "one_more_admin_super_secret_password"
+      access_management: 1

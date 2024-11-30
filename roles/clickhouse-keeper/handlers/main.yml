@@ -1,0 +1,6 @@
+---
+- name: Restart CH keeper service
+  service:
+      name: clickhouse-keeper.service
+      state: restarted
+  listen: "restart ch keeper"

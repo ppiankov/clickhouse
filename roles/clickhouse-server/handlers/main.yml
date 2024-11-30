@@ -1,0 +1,6 @@
+---
+- name: Restart CH service
+  service:
+      name: clickhouse-server.service
+      state: restarted
+  listen: "restart ch"
