@@ -50,20 +50,20 @@
       line: "kernel.task_delayacct=1"
       state: present
 
-- name: Ensure GRUB_CMDLINE_LINUX is properly formatted
-  lineinfile:
-      path: /etc/default/grub
-      regexp: '^GRUB_CMDLINE_LINUX=.*"'
-      line: 'GRUB_CMDLINE_LINUX="crashkernel=auto resume=/dev/mapper/ol-swap rd.lvm.lv=ol/root rd.lvm.lv=ol/swap rhgb quiet"'
+- name: Ensure transparent hugepages are set to never in GRUB_CMDLINE_LINUX
+  replace:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX=".*?)(\s*transparent_hugepage=never)?(")$'
+    replace: '\1 transparent_hugepage=never\3'
   when: ansible_facts['os_family'] == "RedHat"
   notify: Regenerate GRUB configuration
 
-- name: Ensure transparent hugepages are set to never
-  lineinfile:
-      path: /etc/default/grub
-      insertafter: "^GRUB_CMDLINE_LINUX="
-      line: 'GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} transparent_hugepage=never"'
-  when: ansible_facts['os_family'] == "RedHat"
+- name: Ensure transparent hugepages are set to never in GRUB_CMDLINE_LINUX
+  replace:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX=".*?)(\s*transparent_hugepage=never)?(")$'
+    replace: '\1 transparent_hugepage=never\3'
+  when: ansible_facts['os_family'] == "Debian"
   notify: Regenerate GRUB configuration
 
 - name: Create CH data dir

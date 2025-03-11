@@ -48,6 +48,35 @@
   loop:
       - clickhouse-keeper
 
+- name: Enable delay accounting
+  sysctl:
+      name: kernel.task_delayacct
+      value: 1
+      state: present
+      reload: yes
+
+- name: Ensure delay accounting is enabled on boot
+  lineinfile:
+      path: /etc/sysctl.conf
+      line: "kernel.task_delayacct=1"
+      state: present
+
+- name: Ensure transparent hugepages are set to never in GRUB_CMDLINE_LINUX
+  replace:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX=".*?)(\s*transparent_hugepage=never)?(")$'
+    replace: '\1 transparent_hugepage=never\3'
+  when: ansible_facts['os_family'] == "RedHat"
+  notify: Regenerate GRUB configuration
+
+- name: Ensure transparent hugepages are set to never in GRUB_CMDLINE_LINUX
+  replace:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX=".*?)(\s*transparent_hugepage=never)?(")$'
+    replace: '\1 transparent_hugepage=never\3'
+  when: ansible_facts['os_family'] == "Debian"
+  notify: Regenerate GRUB configuration
+
 - name: Create CH data dir
   file:
       path: "{{ item }}"
