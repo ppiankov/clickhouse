@@ -10,9 +10,12 @@
   tasks:
       - include_tasks: roles/clickhouse-server/tasks/clickhouse-install.yml
   handlers:
-      - name: Regenerate GRUB configuration
+      - name: Regenerate GRUB on RedHat
         shell: grub2-mkconfig -o /boot/grub2/grub.cfg
         when: ansible_facts['os_family'] == "RedHat"
+      - name: Regenerate GRUB on Debian
+        shell: update-grub
+        when: ansible_facts['os_family'] == "Debian"
 
       - name: restart ch
         systemd:
