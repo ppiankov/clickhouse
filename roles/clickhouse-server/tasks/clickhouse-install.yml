@@ -166,6 +166,15 @@
       mode: "0644"
   notify: restart ch
 
+- name: Copy CH system_logs.xml config file
+  template:
+      src: roles/clickhouse-server/templates/system_logs.j2
+      dest: /etc/clickhouse-server/config.d/system_logs.xml
+      owner: clickhouse
+      group: clickhouse
+      mode: "0644"
+  notify: restart ch
+
 - name: start clickhouse-server.service
   systemd:
       name: clickhouse-server.service

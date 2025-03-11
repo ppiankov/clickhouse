@@ -1,0 +1,22 @@
+<clickhouse>
+        <trace_log>
+            <database>system</database>
+            <table>trace_log</table>
+            <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            <keep_days>7</keep_days>
+        </trace_log>
+
+        <metric_log>
+            <database>system</database>
+            <table>metric_log</table>
+            <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            <keep_days>7</keep_days>
+        </metric_log>
+
+        <asynchronous_metric_log>
+            <database>system</database>
+            <table>asynchronous_metric_log</table>
+            <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            <keep_days>7</keep_days>
+        </asynchronous_metric_log>
+</clickhouse>
